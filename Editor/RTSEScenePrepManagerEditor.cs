@@ -21,6 +21,8 @@ public class RTSEScenePrepManagerEditor : Editor
 
     SerializedProperty AvailableFactions;
 
+    SerializedProperty ShowDebug;
+
     void OnEnable()
     {
         Instance = (RTSEScenePrepManager)target;
@@ -30,6 +32,7 @@ public class RTSEScenePrepManagerEditor : Editor
         PlayerStartLocations = serializedObject.FindProperty("PlayerStartLocations");
 
         TerrainsParent = serializedObject.FindProperty("TerrainsParent");
+        ShowDebug = serializedObject.FindProperty("ShowDebug");
 
         FactionTypeAdder = serializedObject.FindProperty("FactionTypeAdder");
         AvailableFactions = serializedObject.FindProperty("AvailableFactions");
@@ -66,6 +69,8 @@ public class RTSEScenePrepManagerEditor : Editor
                 GUILayout.Label("Terrain Settings [==========>----------");
                 GUILayout.Space(5);
                 EditorGUILayout.PropertyField(TerrainsParent);
+                GUILayout.Space(5);
+                EditorGUILayout.PropertyField(ShowDebug);
                 GUILayout.Space(5);
                 EditorGUILayout.EndVertical();
                 break;

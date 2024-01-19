@@ -36,6 +36,7 @@ public class RTSEScenePrepManager : MonoBehaviour, IPreRunGameService
     public List<PlayerStartLocation> PlayerStartLocations = new();
     public List<AvailableFaction> AvailableFactions = new();
     public GameObject TerrainsParent = null;
+    public bool ShowDebug = false;
     [Tooltip("Set the prefab here for the system to add to the map.")]
     public GameObject PlayerStartPointPrefab = null;
     public FactionTypeInfo FactionTypeAdder;
@@ -62,7 +63,8 @@ public class RTSEScenePrepManager : MonoBehaviour, IPreRunGameService
 
     public void HandleGameStartRunning(IGameManager source, EventArgs args)
     {
-        
+        if(ShowDebug)
+            Debug.Log("Scene Prep: HandleGameStartRunning");
         if (this.AvailableFactions.Count > 0 && source.FactionSlots.Count > 0 && this.PlayerPositionsParent != null && PlayerPositionsParent.childCount >= source.FactionCount)
         {
             foreach (FactionSlot facSlot in source.ActiveFactionSlots)
@@ -70,82 +72,92 @@ public class RTSEScenePrepManager : MonoBehaviour, IPreRunGameService
                 AvailableFaction thisFactionData = AvailableFactions.Find(AF => AF.FactionType == facSlot.Data.type);
                 if (thisFactionData != null)
                 {
+                    if (ShowDebug)
+                        Debug.Log("Scene Prep: thisFactionData != null");
                     // First we will get the position GO for the player by index
                     for (int i = 0; i < GameMgrFactionCount; i++)
                     {
+                        if (ShowDebug)
+                            Debug.Log("Scene Prep: Looping through GameMgrFactionCount : i = "+i);
                         if (this.PlayerPositionsParent.GetChild(i).TryGetComponent(out PlayerStartLocation thisPlayersStart))
-                    {
+                        {
                             if (this.PlayerPositionsParent.GetChild(i).position == facSlot.FactionSpawnPosition)
                             {
-                        if (facSlot.IsLocalPlayerFaction())
-                        {
-                            this.CamController.PanningHandler.SetPosition(thisPlayersStart.BuildingsParent.GetChild(0).position);
-                        }
-                        // For now we can get the child objects for buildings and units by index so we first run a check on children
-                        // We use index 0 for building positions
-                        if (thisPlayersStart.BuildingsParent.childCount > 0)
-                        {
-                            foreach (Transform child in thisPlayersStart.BuildingsParent)
-                            {
-                                if(child != null)
+                                if (facSlot.IsLocalPlayerFaction())
                                 {
-                                    // this makes sure that it only fires if there is a marker comp, standard GetComponent is not reliable as will always create an empty instance of that comp.
-                                    if (child.gameObject.TryGetComponent(out FactionBuildingMarker bldngMarker))
+                                   // this.CamController.PanningHandler.SetPosition(thisPlayersStart.BuildingsParent.GetChild(0).position);
+                                    this.CamController.PanningHandler.LookAt(thisPlayersStart.BuildingsParent.GetChild(0).position, smooth: false);
+                                }
+                                // For now we can get the child objects for buildings and units by index so we first run a check on children
+                                // We use index 0 for building positions
+                                if (thisPlayersStart.BuildingsParent.childCount > 0)
+                                {
+                                    foreach (Transform child in thisPlayersStart.BuildingsParent)
                                     {
-                                        IBuilding spawnMe = thisFactionData.FactionBuildings.ElementAtOrDefault(bldngMarker.buildingIndexToSpawn).Building;
-                                        if (spawnMe != null)
+                                        if(child != null)
                                         {
-                                            IBuilding placedBuilding = BuildingMgr.CreatePlacedBuildingLocal(
-                                                spawnMe,
-                                                child.position,
-                                                child.rotation,
-                                                new InitBuildingParameters
+                                            // this makes sure that it only fires if there is a marker comp, standard GetComponent is not reliable as will always create an empty instance of that comp.
+                                            if (child.gameObject.TryGetComponent(out FactionBuildingMarker bldngMarker))
+                                            {
+                                                IBuilding spawnMe = thisFactionData.FactionBuildings.ElementAtOrDefault(bldngMarker.buildingIndexToSpawn).Building;
+                                                if (spawnMe != null)
                                                 {
-                                                    buildingCenter = spawnMe.BorderComponent,
-                                                    factionID = facSlot.ID,
-                                                    isBuilt = true,
-                                                    setInitialHealth = true,
-                                                    initialHealth = thisFactionData.FactionBuildings.ElementAtOrDefault(bldngMarker.buildingIndexToSpawn).StartingHealth,
-                                                    giveInitResources = true,
-                                                    playerCommand = false
+                                                    IBuilding placedBuilding = BuildingMgr.CreatePlacedBuildingLocal(
+                                                        spawnMe,
+                                                        child.position,
+                                                        child.rotation,
+                                                        new InitBuildingParameters
+                                                        {
+                                                            buildingCenter = spawnMe.BorderComponent,
+                                                            factionID = facSlot.ID,
+                                                            isBuilt = true,
+                                                            setInitialHealth = true,
+                                                            initialHealth = thisFactionData.FactionBuildings.ElementAtOrDefault(bldngMarker.buildingIndexToSpawn).StartingHealth,
+                                                            giveInitResources = true,
+                                                            playerCommand = false
+                                                        }
+                                                    );
                                                 }
-                                            );
-                                            
+                                            }
+                                        }
+                                    }
+                                }
+                                // We do the same here for units on index 1
+                                if (thisPlayersStart.UnitsParent.childCount > 0)
+                                {
+                                    foreach (Transform child in thisPlayersStart.UnitsParent)
+                                    {
+                                        if (child.gameObject.TryGetComponent(out FactionUnitMarker unitMarker))
+                                        {
+                                            // Here we create an instance for this iteration, you can control all it's functions and props before spawning it
+                                            IUnit spawnMe = thisFactionData.FactionUnits.ElementAtOrDefault(unitMarker.unitIndexToSpawn).Unit;
+                                            if (spawnMe != null)
+                                            {
+                                                // Spawning just the unit
+                                                this.UnitMgr.CreateUnit(
+                                                    spawnMe,
+                                                    child.position,
+                                                    child.rotation,
+                                                    new InitUnitParameters
+                                                    {
+                                                        factionID = facSlot.ID,
+                                                        giveInitResources = true,
+                                                        playerCommand = false
+                                                    }
+                                                );
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
-                        // We do the same here for units on index 1
-                        if (thisPlayersStart.UnitsParent.childCount > 0)
-                        {
-                            foreach (Transform child in thisPlayersStart.UnitsParent)
+                           /* else
                             {
-                                if (child.gameObject.TryGetComponent(out FactionUnitMarker unitMarker))
-                                {
-                                    // Here we create an instance for this iteration, you can control all it's functions and props before spawning it
-                                    IUnit spawnMe = thisFactionData.FactionUnits.ElementAtOrDefault(unitMarker.unitIndexToSpawn).Unit;
-                                    if (spawnMe != null)
-                                    {
-                                        // Spawning just the unit
-                                        this.UnitMgr.CreateUnit(
-                                            spawnMe,
-                                            child.position,
-                                            child.rotation,
-                                            new InitUnitParameters
-                                            {
-                                                factionID = facSlot.ID,
-                                                giveInitResources = true,
-                                                playerCommand = false
-                                            }
-                                        );
-                                    }
-                                }
-                            }
+                                if (ShowDebug)
+                                    Debug.LogError("Scene Prep Manager: Faction Initial Cam Look at Position is not set correctly for Player Position: "+ this.PlayerPositionsParent.GetChild(i).position);
+                            }*/
                         }
-                    }
-                        }
-                    }
+                        
+                    } // end for loop
                 }
             }
         }
