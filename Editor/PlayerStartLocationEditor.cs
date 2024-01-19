@@ -203,7 +203,10 @@ public class PlayerStartLocationEditor : Editor
                 {
                     // Now the buildingIndexToSpawn has been automatically incremented :-) your welcome 
                     int buildingIndex = (Instance.BuildingsParent.childCount - 1)+1;
-                    Instantiate(new GameObject("BuildingPosition"), this.Instance.BuildingsParent).AddComponent<FactionBuildingMarker>().buildingIndexToSpawn = buildingIndex++;
+                    GameObject bgo = new GameObject("BuildingPosition ("+ buildingIndex+")");
+                    bgo.transform.SetParent(this.Instance.BuildingsParent, false);
+                    bgo.AddComponent<FactionBuildingMarker>().buildingIndexToSpawn = buildingIndex++;
+                    ///Instantiate(new GameObject("BuildingPosition"), this.Instance.BuildingsParent).AddComponent<FactionBuildingMarker>().buildingIndexToSpawn = buildingIndex++;
                     //Instantiate(new GameObject("BuildingPosition"), this.Instance.BuildingsParent).AddComponent<FactionBuildingMarker>();
                 }
                 break;
@@ -211,7 +214,10 @@ public class PlayerStartLocationEditor : Editor
                 if (this.Instance.UnitsParent != null)
                 {
                     int unitIndex = (Instance.UnitsParent.childCount - 1) + 1;
-                    Instantiate(new GameObject("UnitPosition"), this.Instance.UnitsParent).AddComponent<FactionUnitMarker>().unitIndexToSpawn = unitIndex++;
+                    GameObject ugo = new GameObject("UnitPosition (" + unitIndex + ")");
+                    ugo.transform.SetParent(this.Instance.UnitsParent, false);
+                    ugo.AddComponent<FactionUnitMarker>().unitIndexToSpawn = unitIndex++;
+                    //Instantiate(new GameObject("UnitPosition"), this.Instance.UnitsParent).AddComponent<FactionUnitMarker>().unitIndexToSpawn = unitIndex++;
                     //Instantiate(new GameObject("UnitPosition"), this.Instance.UnitsParent).AddComponent<FactionUnitMarker>();
                 }
                 break;
@@ -219,8 +225,11 @@ public class PlayerStartLocationEditor : Editor
                 if (this.Instance.BuildingsParent != null)
                 {
                     int resIndex = (Instance.ResourcesParent.childCount - 1) + 1;
-                    Instantiate(new GameObject("ResourcePosition"), this.Instance.ResourcesParent).AddComponent<FactionResourceMarker>().ResourceIndex = resIndex++;
-                    //Instantiate(new GameObject("ResourcePosition"), this.Instance.BuildingsParent).AddComponent<FactionResourceMarker>();
+                    GameObject rgo = new GameObject("ResourcePosition (" + resIndex + ")");
+                    rgo.transform.SetParent(this.Instance.ResourcesParent, false);
+                    rgo.AddComponent<FactionResourceMarker>().ResourceIndex = resIndex++;
+                    //Instantiate(new GameObject("ResourcePosition"), this.Instance.ResourcesParent).AddComponent<FactionResourceMarker>().ResourceIndex = resIndex++;
+                    //Instantiate(new GameObject("ResourcePosition"), this.Instance.ResourcesParent).AddComponent<FactionResourceMarker>();
                 }
                 break;
         }
