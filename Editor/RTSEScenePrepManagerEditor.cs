@@ -129,6 +129,8 @@ public class RTSEScenePrepManagerEditor : Editor
         if(this.Instance.PlayerPositionsParent != null && this.Instance.PlayerStartPointPrefab != null)
         {
             PlayerStartLocation newLocation = GameObject.Instantiate(this.Instance.PlayerStartPointPrefab, this.Instance.PlayerPositionsParent).GetComponent<PlayerStartLocation>();
+            var setPos = this.Instance.PlayerPositionsParent.childCount > 0 ? this.Instance.PlayerPositionsParent.childCount - 1 : this.Instance.PlayerPositionsParent.childCount;
+            newLocation.name = "PlayerStartPosition ("+ setPos + ")"; 
             newLocation.RTSESCPM = this.Instance;
             this.Instance.PlayerStartLocations.Add(newLocation);
         }
