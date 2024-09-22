@@ -23,6 +23,7 @@ public class PlayerStartLocationPropDrawer : PropertyDrawer
         var addPlayerRect = new Rect(position.x + 230, position.y, 40, 40);
         var addBuildingRect = new Rect(position.x + 270, position.y, 40, 40);
         var addUnitRect = new Rect(position.x + 310, position.y, 40, 40);
+        var addResourceRect = new Rect(position.x + 350, position.y, 40, 40);
         int index = -1;
         Regex regex = new Regex(@"\[([0-9]+)\]");
         if(regex.IsMatch(property.propertyPath)){
@@ -49,6 +50,7 @@ public class PlayerStartLocationPropDrawer : PropertyDrawer
         Texture2D markerIcon = EditorGUIUtility.Load("Assets/RTS Engine/Modules/RTSE_ScenePreparationManager/Textures/player-marker-icon.png") as Texture2D;
         Texture2D buildingIcon = EditorGUIUtility.Load("Assets/RTS Engine/Modules/RTSE_ScenePreparationManager/Textures/building-icon.png") as Texture2D;
         Texture2D unitIcon = EditorGUIUtility.Load("Assets/RTS Engine/Modules/RTSE_ScenePreparationManager/Textures/unit-icon.png") as Texture2D;
+        Texture2D resourceIcon = EditorGUIUtility.Load("Assets/RTS Engine/Modules/RTSE_ScenePreparationManager/Textures/unit-icon.png") as Texture2D;
 
         EditorGUIUtility.labelWidth = 0;
         //Tempest - Couldn't figure out how to click on the Item row so using one of the buttons to select the gameObject in scene
@@ -75,6 +77,10 @@ public class PlayerStartLocationPropDrawer : PropertyDrawer
             //Debug.Log("Clicked addBuildingRect for element at: " + index);
         }
         if (GUI.Button(addUnitRect, new GUIContent(unitIcon, "Add a Unit Marker")))
+        {
+            //Debug.Log("Clicked addUnitRect for element at: " + index);
+        }
+        if (GUI.Button(addResourceRect, new GUIContent(resourceIcon, "Add a Resource Marker")))
         {
             //Debug.Log("Clicked addUnitRect for element at: " + index);
         }

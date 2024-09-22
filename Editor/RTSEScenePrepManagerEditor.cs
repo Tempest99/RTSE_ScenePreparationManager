@@ -95,11 +95,17 @@ public class RTSEScenePrepManagerEditor : Editor
 
     private void OnSceneGUI()
     {
-        if(!EditorApplication.isPlaying && this.Instance.IsPlacingPlayerStart)
+        if(!EditorApplication.isPlaying)// && this.Instance.IsPlacingPlayerStart)
         {
             Event current = Event.current;
+            // Debug.Log("current.keyCode "+ current.keyCode);
+            if (current.isKey)
+            {
+                Debug.Log("Detected key code: " + current.keyCode);
+            }
             if ((current.type == EventType.KeyDown && KeyCode.LeftControl == current.keyCode) && (current.type == EventType.MouseDown && current.button == 0))
             {
+                Debug.Log("did we click the + button");
                 Ray newPosRay = HandleUtility.GUIPointToWorldRay(current.mousePosition);
                 if(Physics.Raycast(newPosRay, out RaycastHit hit, Mathf.Infinity, LayerMask.NameToLayer("GroundTerrain")))
                 {
@@ -117,6 +123,7 @@ public class RTSEScenePrepManagerEditor : Editor
             this.Instance.AvailableFactions.Add(
                 new AvailableFaction(
                     this.Instance.FactionTypeAdder,
+                    new(),
                     new(),
                     new()
                 )

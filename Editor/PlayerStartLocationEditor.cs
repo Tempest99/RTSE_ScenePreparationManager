@@ -227,7 +227,7 @@ public class PlayerStartLocationEditor : Editor
                     int resIndex = (Instance.ResourcesParent.childCount - 1) + 1;
                     GameObject rgo = new GameObject("ResourcePosition (" + resIndex + ")");
                     rgo.transform.SetParent(this.Instance.ResourcesParent, false);
-                    rgo.AddComponent<FactionResourceMarker>().ResourceIndex = resIndex++;
+                    rgo.AddComponent<FactionResourceMarker>().resourceIndexToSpawn = resIndex++;
                     //Instantiate(new GameObject("ResourcePosition"), this.Instance.ResourcesParent).AddComponent<FactionResourceMarker>().ResourceIndex = resIndex++;
                     //Instantiate(new GameObject("ResourcePosition"), this.Instance.ResourcesParent).AddComponent<FactionResourceMarker>();
                 }

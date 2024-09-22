@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class FactionResourceMarker : MonoBehaviour
 {
-    public int ResourceIndex = 0;
+    public int resourceIndexToSpawn = 0;
 }

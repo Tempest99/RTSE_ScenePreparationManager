@@ -157,7 +157,7 @@ public class RTSEScenePrepManager : MonoBehaviour, IPreRunGameService
                                                 } else
                                                 {
                                                     if (ShowDebug)
-                                                        Debug.LogWarning("Scene Prep: No faction building set in ScenePrepManager or too many building markers for the amount of buildings to spawn" +
+                                                        Debug.LogWarning("Scene Prep: No faction building set in ScenePrepManager or too many building markers for the amount of buildings to spawn " +
                                                         "Look at the PlayerStartPosition no: " + i);
                                                 }
                                             }
@@ -183,7 +183,7 @@ public class RTSEScenePrepManager : MonoBehaviour, IPreRunGameService
                                                 Debug.Log("Scene Prep: unitMarker = " + unitMarker.unitIndexToSpawn);
                                                 if (ShowDebug)
                                                     Debug.Log("Scene Prep: Looping Through thisPlayersStart.BuildingsParent -> child.gameObject.TryGetComponent(out FactionUnitMarker unitMarker) ");
-                                                if (thisFactionData.FactionBuildings.ElementAtOrDefault(unitMarker.unitIndexToSpawn).IsValid())
+                                                if (thisFactionData.FactionUnits.ElementAtOrDefault(unitMarker.unitIndexToSpawn).IsValid())
                                                 {
                                                     // Here we create an instance for this iteration, you can control all it's functions and props before spawning it
                                                     IUnit spawnMe = thisFactionData.FactionUnits.ElementAtOrDefault(unitMarker.unitIndexToSpawn).Unit;
@@ -209,7 +209,61 @@ public class RTSEScenePrepManager : MonoBehaviour, IPreRunGameService
                                                 } else
                                                 {
                                                     if (ShowDebug)
-                                                        Debug.LogWarning("Scene Prep: No faction unit set in ScenePrepManager or too many unit markers for the amount of units to spawn" +
+                                                        Debug.LogWarning("Scene Prep: No faction unit set in ScenePrepManager or too many unit markers for the amount of units to spawn " +
+                                                        "Look at the PlayerStartPosition no: " + i);
+                                                }
+                                            }
+                                        }
+                                    } // end for loop
+                                }
+                                //Resources
+                                // We do the same here for Resources on index 1
+                                if (thisPlayersStart.ResourcesParent.childCount > 0)
+                                {
+                                    if (ShowDebug)
+                                        Debug.Log("Scene Prep: thisPlayersStart.ResourcesParent.childCount > 0 :: Count = " + thisPlayersStart.UnitsParent.childCount);
+                                    foreach (Transform child in thisPlayersStart.ResourcesParent)
+                                    {
+                                        if (ShowDebug)
+                                            Debug.Log("Scene Prep: Looping Through thisPlayersStart.ResourcesParent ");
+
+                                        if (child != null)
+                                        {
+                                            if (ShowDebug)
+                                                Debug.Log("Scene Prep: Looping Through thisPlayersStart.ResourcesParent -> child != null ");
+                                            if (child.gameObject.TryGetComponent(out FactionResourceMarker resourceMarker))
+                                            {
+                                                Debug.Log("Scene Prep: ResourceMarker = " + resourceMarker.resourceIndexToSpawn);
+                                                if (ShowDebug)
+                                                    Debug.Log("Scene Prep: Looping Through thisPlayersStart.ResourcesParent -> child.gameObject.TryGetComponent(out FactionUnitMarker unitMarker) ");
+                                                if (thisFactionData.FactionResources.ElementAtOrDefault(resourceMarker.resourceIndexToSpawn).IsValid())
+                                                {
+                                                    // Here we create an instance for this iteration, you can control all it's functions and props before spawning it
+                                                    IResource spawnMe = thisFactionData.FactionResources.ElementAtOrDefault(resourceMarker.resourceIndexToSpawn).Resource;
+                                                    if (ShowDebug)
+                                                        Debug.Log("Scene Prep: ElementAtOrDefault(resourceMarker.resourceIndexToSpawn).Resource " + spawnMe);
+                                                    if (spawnMe != null)
+                                                    {
+                                                        // Spawning just the resource
+                                                        this.ResourceMgr.CreateResource(
+                                                            spawnMe,
+                                                            child.position,
+                                                            child.rotation, 
+                                                            new InitResourceParameters
+                                                            {
+                                                                factionID = facSlot.ID,
+                                                                free = true, 
+                                                                playerCommand = false 
+                                                            }
+                                                        );
+                                                        if (ShowDebug)
+                                                            Debug.Log("Scene Prep: Success we have placed a Resource -> " + ResourceMgr.ToString());
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (ShowDebug)
+                                                        Debug.LogWarning("Scene Prep: No faction Resource set in ScenePrepManager or too many Resource markers for the amount of Resource to spawn " +
                                                         "Look at the PlayerStartPosition no: " + i);
                                                 }
                                             }
@@ -246,15 +300,18 @@ public class AvailableFaction
     public FactionTypeInfo FactionType = null;
     public List<FactionBuilding> FactionBuildings = new();
     public List<FactionUnit> FactionUnits = new();
+    public List<FactionResource> FactionResources = new();
     public AvailableFaction(
         FactionTypeInfo FactionType,
         List<FactionBuilding> FactionBuildings,
-        List<FactionUnit> FactionUnits
+        List<FactionUnit> FactionUnits,
+        List<FactionResource> FactionResources
     )
     {
         this.FactionType = FactionType;
         this.FactionBuildings = FactionBuildings;
         this.FactionUnits = FactionUnits;
+        this.FactionResources = FactionResources;
     }
 }
 
@@ -277,5 +334,15 @@ public class FactionUnit
     public FactionUnit(Unit Unit)
     {
         this.Unit = Unit;
+    }
+}
+
+[Serializable]
+public class FactionResource
+{
+    public Resource Resource = null;
+    public FactionResource(Resource Resource)
+    {
+        this.Resource = Resource;
     }
 }
